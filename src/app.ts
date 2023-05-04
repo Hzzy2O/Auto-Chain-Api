@@ -110,11 +110,13 @@ class AutoGptManager {
     const { ai, config, messages, filePath } = value
 
     const result = await ai.singleRun(config.ai_goals)
+    let finish = false
     if (result.reply_json.command.name === FINISH_NAME) {
       this.cache.set(gpt_id, {
         ...value,
         finished: true,
       })
+      finish = true
     }
     else {
       this.cache.set(gpt_id, {
@@ -125,7 +127,7 @@ class AutoGptManager {
 
     return {
       ...result,
-      finish: result.tool_result.name === FINISH_NAME,
+      finish,
       has_file: isEmptyFolder(filePath),
     }
   }

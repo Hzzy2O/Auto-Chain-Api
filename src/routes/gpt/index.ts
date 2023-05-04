@@ -18,6 +18,7 @@ router.get('/', (_, res) => {
       ai_role,
       ai_goals,
       messages: ai.messages,
+      finish: ai.finished,
     }
   })
 
