@@ -1,9 +1,14 @@
-# Auto-Chain-Api
-基于Langchain实现的 AutoGPT 应用程序接口，使用 Node.js、TypeScript 和 Express 构建。
-它提供了自主运行AI的功能，并且还提供了接入工具的能力，如文件操作、搜索、执行代码和命令行，以及生成图片和克隆Git库等## ✨ 功能介绍
+#💻 Auto-Chain-Api
 
-## 接入工具
-自主运行 AI：根据用户需求自动运行 AI，提供智能解决方案。
+<div>
+  <a href="./README.md">中文</a> |
+  <a href="./README.en.md">English</a>
+</div>
+
+基于Langchain实现的 AutoGPT 应用程序接口，使用 Node.js、TypeScript 和 Express 构建。
+它提供了自主运行AI的功能，并且还提供了接入工具的能力，如文件操作、搜索、执行代码和命令行，以及生成图片和克隆Git库等
+
+##🛠️ 搭载工具
 文件操作能力：实现文件的读写、删除、查找等基本操作。
 搜索能力：提供搜索功能，检索互联网最新信息。
 执行代码：可执行用户提供的代码，方便快速测试和验证。
@@ -11,12 +16,11 @@
 生成图片：可根据用户的需求生成图片。
 克隆Git仓库：方便快速获取Git 仓库。
 
-## 环境要求
+##📋 环境要求
 Node.js v18 或更高版本
 
-## 安装步骤
+##🚀 安装步骤
 克隆项目到本地：
-
 
 ```bash
 git clone https://github.com/Hzzy2O/Auto-Chain-Api.git
@@ -60,11 +64,15 @@ PORT=3000
 npm run dev
 ```
 
-## API 文档
-请查看 API 文档 了解详细的接口信息。
+##📄 API 文档
+<span>
+请查看
+<a href="./wiki/api.md">API文档</a>
+了解详细的接口信息
+</span>
 
-## 贡献
+##🤝 贡献
 欢迎提交 Pull Request 与 Issue，共同完善和改进项目！
 
-## 许可证
+##📝 许可证
 本项目采用 MIT 许可证 授权。
