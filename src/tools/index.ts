@@ -2,7 +2,7 @@ import { existsSync, mkdirSync } from 'node:fs'
 
 import { WebSearchTool } from './search'
 import { BrowseWebTool } from './browse'
-import { ScrapeLinks, TextSummary } from './processing'
+import { ScrapeLinks, TextSummary, TranslateTool } from './processing'
 import { CodeAnalyzer, CodeExecuter, CodeImprover, TestCaseWriter } from './code'
 import { ImageGenerator } from './image'
 import { AppendFileTool, DeleteFileTool, DownloadFileTool, SearchFileTool } from './file'
@@ -29,6 +29,7 @@ export function getTools(store: NodeIOFileStore) {
     new ShellPopenExecutor({ store }),
     new ImageGenerator({ store }),
     new BrowseWebTool(),
+    new TranslateTool(),
     new WebSearchTool(),
     new CodeAnalyzer(),
     new CodeImprover(),

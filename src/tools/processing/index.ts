@@ -1,8 +1,10 @@
 import { StructuredTool } from 'langchain/tools'
 import { z } from 'zod'
 
+import { HumanChatMessage } from 'langchain/schema'
 import { scrapeLinks, scrapeText } from '../browse/request'
 import { summarizeText } from './text'
+import { getChatAI } from '@/api'
 
 export class TextSummary extends StructuredTool {
   name = 'text-summary'
@@ -32,5 +34,28 @@ export class ScrapeLinks extends StructuredTool {
   async _call({ url }: z.infer<typeof this.schema>) {
     const links = await scrapeLinks(url)
     return `"Result": ${links}`
+  }
+}
+
+export class TranslateTool extends StructuredTool {
+  schema = z.object({
+    target_language: z.string().describe('the language to translate to'),
+    text: z.string().describe('the text to translate'),
+  })
+
+  name = 'translate-tool'
+
+  description = 'translate text to another language'
+
+  async _call({ target_language, text }: z.infer<typeof this.schema>) {
+    const chat = getChatAI()
+
+    const { text: result } = await chat.call([
+      new HumanChatMessage(
+        `please translate the follow text to ${target_language}\n ${text}`,
+      ),
+    ])
+
+    return `"Result": ${result}`
   }
 }
