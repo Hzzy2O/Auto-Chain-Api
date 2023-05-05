@@ -1,31 +1,31 @@
-import { Buffer } from 'node:buffer'
-import { google } from 'googleapis'
+import { Config } from '@/config'
+import type { Recordable } from '@/types'
 
-export async function searchGoogle(query: string) {
-  const service = google.customsearch('v1')
-
-  const result = await service.cse.list({
-    q: query,
-    cx: '067682bbe44904a09',
-    num: 4,
-    key: 'AIzaSyAluRA8ALXc2bFeW0snxJmtYVHdtZueHuQ',
+export async function searchByBingAI(query: string) {
+  const body = JSON.stringify({
+    question: query,
+    style: 'precise',
+  })
+  const token = JSON.stringify([{
+    name: '_U',
+    value: Config.BING_AI_KEY,
+  }])
+  const response = await fetch(`${Config.BING_AI_URL}/api`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body,
   })
 
-  const searchResults = result.data.items || []
-  const searchResultsLinks = searchResults.map(item => item.link)
+  const { data, message } = await response.json() as Recordable
+  if (!data)
+    return message
+  const links = data.urls?.reduce((acc, cur) => {
+    acc += `${cur.title}:${cur.url};`
+    return acc
+  }, '')
 
-  return safeGoogleResults(searchResultsLinks)
-}
-
-function safeGoogleResults(results: string | string[]) {
-  if (Array.isArray(results)) {
-    const safeMessage = JSON.stringify(
-      results.map(result => Buffer.from(result, 'utf-8').toString('utf-8')),
-    )
-    return safeMessage
-  }
-  else {
-    const safeMessage = Buffer.from(results, 'utf-8').toString('utf-8')
-    return safeMessage
-  }
+  return `${data.answer}\n Reference: \n${links}`
 }

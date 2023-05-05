@@ -8,11 +8,15 @@ export async function generateImgWithBing(prompt: string, basePath: string) {
   const body = JSON.stringify({
     prompt,
   })
+  const token = JSON.stringify({
+    name: '_U',
+    value: Config.BING_AI_KEY,
+  })
   const response = await fetch(`${Config.BING_AI_URL}/create_image`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${Config.BING_AI_KEY}`,
+      'Authorization': `Bearer ${token}`,
     },
     body,
   })

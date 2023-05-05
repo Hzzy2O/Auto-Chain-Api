@@ -2,6 +2,7 @@ import { StructuredTool } from 'langchain/tools'
 import { z } from 'zod'
 import { searchGoogle } from './google'
 import { searchDuckDuckGo } from './ddg'
+import { searchByBingAI } from './bingAI'
 import { Config } from '@/config'
 
 export class WebSearchTool extends StructuredTool {
@@ -19,6 +20,8 @@ export class WebSearchTool extends StructuredTool {
     try {
       if (Config.SEARCH_ENGINE === 'google')
         return await searchGoogle(query)
+      else if (Config.SEARCH_ENGINE === 'bing')
+        return await searchByBingAI(query)
       else
         return await searchDuckDuckGo(query)
     }
