@@ -2,7 +2,7 @@ import { appendFile, readFile, unlink, writeFile } from 'node:fs/promises'
 import { mkdtempSync, rm, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { PineconeClient } from '@pinecone-database/pinecone'
-import { HNSWLib } from 'langchain/vectorstores/hnswlib'
+import { MemoryVectorStore } from 'langchain/vectorstores/memory'
 
 import { BaseFileStore } from 'langchain/schema'
 import { PineconeStore } from 'langchain/vectorstores/pinecone'
@@ -67,12 +67,8 @@ export async function getVectorStore() {
     })
   }
   else {
-    return new HNSWLib(
+    return new MemoryVectorStore(
       embeddings,
-      {
-        space: 'cosine',
-        numDimensions: 1536,
-      },
     )
   }
 }
