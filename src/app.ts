@@ -1,14 +1,11 @@
-import { mkdirSync, readdirSync, rmdirSync } from 'node:fs'
-import { PineconeClient } from '@pinecone-database/pinecone'
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
+import { mkdirSync, readdirSync, rm, rmdirSync } from 'node:fs'
 import { v4 as uuid } from 'uuid'
-import { PineconeStore } from 'langchain/vectorstores/pinecone'
 
-import { Config } from './config'
+import type { Config } from './config'
 
 import { getChatAI } from './api'
 import { Cache } from './utils/cache'
-import { NodeIOFileStore } from './store'
+import { NodeIOFileStore, getVectorStore } from './store'
 import { AutoGPT } from '@/autogpt'
 import { getTools } from '@/tools'
 import { AutoGPTOutputParser } from '@/parser'
@@ -28,53 +25,26 @@ interface RunResult {
   reply_json: AutoGPTAction
   tool_result: AutoGPTToolResult
   finish?: boolean
-  has_file?: boolean
 }
-
-function isEmptyFolder(path: string) {
-  const files = readdirSync(path)
-  return files.length === 0
-}
-
-const client = new PineconeClient()
 
 class AutoGptManager {
   static currentSymbol: string | null = null
   cache: Cache<CacheValue>
 
   constructor() {
-    this.cache = new Cache(30)
+    this.cache = new Cache(1)
   }
 
   async createAI(config: Config) {
     const { ai_name, ai_role } = config
 
-    await client.init({
-      apiKey: Config.PINECONE_API_KEY,
-      environment: Config.PINECONE_ENVIRONMENT,
-    })
-    const pineconeIndex = client.Index(Config.PINECONE_INDEX)
-
-    // const vectorStore = new HNSWLib(new OpenAIEmbeddings({
-    //   openAIApiKey: Config.OPENAI_API_KEY,
-    // }, {
-    //   basePath: Config.OPENAI_URL,
-    // }), {
-    //   space: 'cosine',
-    //   numDimensions: 1536,
-    // })
-    const vectorStore = new PineconeStore(new OpenAIEmbeddings({
-      openAIApiKey: Config.OPENAI_API_KEY,
-    }, {
-      basePath: Config.OPENAI_URL,
-    }), {
-      pineconeIndex,
-    })
+    const vectorStore = await getVectorStore()
 
     const gpt_id = uuid()
 
     const filePath = `tmp/${gpt_id}`
-    mkdirSync(filePath, { recursive: true })
+    mkdirSync(filePath)
+    console.log(readdirSync(filePath))
     const fileStore = new NodeIOFileStore(filePath)
 
     const autogpt = AutoGPT.fromLLMAndTools(
@@ -107,7 +77,7 @@ class AutoGptManager {
     if (value.finished)
       throw new Error('GPT already finished')
 
-    const { ai, config, messages, filePath } = value
+    const { ai, config, messages } = value
 
     const result = await ai.singleRun(config.ai_goals)
     let finish = false
@@ -128,7 +98,6 @@ class AutoGptManager {
     return {
       ...result,
       finish,
-      has_file: isEmptyFolder(filePath),
     }
   }
 
@@ -141,6 +110,16 @@ class AutoGptManager {
   }
 
   listAI() {
+    const list = this.cache.getAll()
+    const dirs = readdirSync('tmp')
+    dirs.forEach((dir) => {
+      if (!list.find(item => item.id === dir)) {
+        rm(`tmp/${dir}`, { recursive: true, force: true }, (err) => {
+          console.log(err, dir)
+        })
+      }
+    })
+
     return this.cache.getAll()
   }
 

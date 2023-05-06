@@ -39,7 +39,6 @@ Run a specified AI
 - `reply_json` (`Object`): Reply returned by AI
 - `tool_result` (`Object`): Result returned by AI tool
 - `finish` (`Boolean`): Whether the AI has finished or not
-- `has_file` (`Boolean`): Whether the AI has an output file or not
 
 ### POST /delete
 

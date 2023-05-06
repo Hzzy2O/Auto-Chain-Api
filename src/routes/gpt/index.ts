@@ -40,16 +40,16 @@ router.post('/create', validateBody(['ai_name', 'ai_role', 'ai_goals']), async (
 router.post('/run', validateBody(['gpt_id']), async (req, res) => {
   try {
     const { gpt_id } = req.body
-    const { reply_json, tool_result, finish, has_file } = await manager.runAI(gpt_id)
+    const { reply_json, tool_result, finish } = await manager.runAI(gpt_id)
 
     res.send({
       reply_json,
       tool_result,
       finish,
-      has_file,
     })
   }
   catch (err) {
+    console.log(err)
     res.status(400).send({
       message: err.message ? err.message : err,
     })

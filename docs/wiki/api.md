@@ -39,7 +39,6 @@
 - `reply_json` (`Object`): AI返回的回复
 - `tool_result` (`Object`): AI工具返回的结果
 - `finish` (`Boolean`): AI是否已完成
-- `has_file` (`Boolean`): AI是否有输出文件
 
 ### POST /delete
 

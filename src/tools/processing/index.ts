@@ -39,7 +39,7 @@ export class ScrapeLinks extends StructuredTool {
 
 export class TranslateTool extends StructuredTool {
   schema = z.object({
-    target_language: z.string().describe('the language to translate to'),
+    target_language: z.enum(['en', 'es', 'fr', 'de', 'it', 'ja', 'ko', 'pt', 'ru', 'zh']).describe('the language to translate to'),
     text: z.string().describe('the text to translate'),
   })
 
