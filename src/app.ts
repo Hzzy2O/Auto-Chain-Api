@@ -104,7 +104,7 @@ class AutoGptManager {
   getAI(gpt_id: string) {
     const value = this.cache.get(gpt_id)
     if (!value)
-      throw new Error('GPT not found')
+      return undefined
 
     return value
   }

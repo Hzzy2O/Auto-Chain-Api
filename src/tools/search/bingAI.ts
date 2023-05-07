@@ -22,10 +22,11 @@ export async function searchByBingAI(query: string) {
   const { data, message } = await response.json() as Recordable
   if (!data)
     return message
-  const links = data.urls?.reduce((acc, cur) => {
-    acc += `${cur.title}:${cur.url};`
-    return acc
-  }, '')
+  // const links = data.urls?.reduce((acc, cur) => {
+  //   acc += `${cur.title}:${cur.url};`
+  //   return acc
+  // }, '')
+  const links = data.urls?.map(e => e.url)
 
-  return `${data.answer}\n Reference: \n${links}`
+  return `${data.answer}\n ${links?.length ? `Reference: \n${links}` : ''}`
 }

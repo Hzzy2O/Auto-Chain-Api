@@ -80,6 +80,12 @@ router.post('/download', validateBody(['gpt_id']), (req, res) => {
 router.post('/file', validateBody(['gpt_id']), (req, res) => {
   const { gpt_id } = req.body
   const ai = manager.getAI(gpt_id)
+  if (!ai) {
+    res.status(400).send({
+      message: 'gpt not found',
+    })
+    return
+  }
   const inputPath = ai.filePath
   const info = getAllFilesInfo(inputPath)
 
