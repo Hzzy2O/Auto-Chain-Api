@@ -1,22 +1,18 @@
-import { StructuredTool } from 'langchain/tools'
-import { z } from 'zod'
+import { Tool } from 'langchain/tools'
 import { searchGoogle } from './google'
 import { searchDuckDuckGo } from './ddg'
 import { searchByBingAI } from './bingAI'
 import { Config } from '@/config'
 
-export class WebSearchTool extends StructuredTool {
+export class WebSearchTool extends Tool {
   name = 'search-tool'
   description = 'according to the query, search the web and return the relevant links'
-  schema = z.object({
-    query: z.string().describe('the query to search'),
-  })
 
   constructor() {
     super()
   }
 
-  async _call({ query }: z.infer<typeof this.schema>) {
+  async _call(query: string) {
     try {
       if (Config.SEARCH_ENGINE === 'google')
         return await searchGoogle(query)

@@ -1,4 +1,4 @@
-import { BaseOutputParser } from 'langchain/schema'
+import { BaseOutputParser } from 'langchain/schema/output_parser'
 import balanced from 'balanced-match'
 import { fixAndParseJson } from './fix'
 import type { AutoGPTAction } from '@/autogpt/schema'

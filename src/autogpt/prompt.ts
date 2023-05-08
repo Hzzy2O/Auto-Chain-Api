@@ -1,3 +1,4 @@
+import { writeFileSync } from 'node:fs'
 import type { SerializedBasePromptTemplate } from 'langchain/prompts'
 import { BaseChatPromptTemplate } from 'langchain/prompts'
 import type {
@@ -122,6 +123,11 @@ export class AutoGPTPrompt
       ...historicalMessages,
       inputMessage,
     ]
+    writeFileSync('log.txt', JSON.stringify({
+      usedTokens,
+      relevantMemoryTokens,
+      messages,
+    }, null, 2), 'utf8')
     return messages
   }
 
