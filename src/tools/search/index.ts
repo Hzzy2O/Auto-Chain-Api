@@ -6,7 +6,7 @@ import { Config } from '@/config'
 
 export class WebSearchTool extends Tool {
   name = 'search-tool'
-  description = 'according to the query, search the web and return the relevant links'
+  description = 'according to the query, search the web and return the relevant information or links'
 
   constructor() {
     super()

@@ -11,11 +11,8 @@ import { LLMChain } from 'langchain/chains'
 import type { BaseChatModel } from 'langchain/chat_models'
 import { TokenTextSplitter } from 'langchain/text_splitter'
 
-import { AutoGPTPrompt } from './prompt'
+import { ChatPrompt } from './prompt'
 
-// import { HumanInputRun } from "./tools/human/tool"; // TODO
-import type { AutoGPTToolResult, ObjectTool } from './schema'
-import { FINISH_NAME } from './schema'
 import {
   getEmbeddingContextSize,
   getModelContextSize,
@@ -24,8 +21,6 @@ import {
 import { AutoGPTOutputParser } from '@/parser'
 
 export interface AutoGPTInput {
-  aiName: string
-  aiRole: string
   memory: VectorStoreRetriever
   humanInTheLoop?: boolean
   outputParser?: AutoGPTOutputParser
@@ -33,21 +28,15 @@ export interface AutoGPTInput {
 }
 
 export class AutoGPT {
-  aiName: string
-
   memory: VectorStoreRetriever
 
   fullMessageHistory: BaseChatMessage[]
-
-  nextActionCount: number
 
   chain: LLMChain
 
   outputParser: AutoGPTOutputParser
 
-  tools: ObjectTool[]
-
-  feedbackTool?: Tool
+  tools: Tool[]
 
   maxIterations: number
 
@@ -55,26 +44,21 @@ export class AutoGPT {
   textSplitter: TokenTextSplitter
 
   constructor({
-    aiName,
     memory,
     chain,
     outputParser,
     tools,
-    feedbackTool,
     maxIterations,
-  }: Omit<Required<AutoGPTInput>, 'aiRole' | 'humanInTheLoop'> & {
+  }: Omit<Required<AutoGPTInput>, | 'humanInTheLoop'> & {
     chain: LLMChain
-    tools: ObjectTool[]
+    tools: Tool[]
     feedbackTool?: Tool
   }) {
-    this.aiName = aiName
     this.memory = memory
     this.fullMessageHistory = []
-    this.nextActionCount = 0
     this.chain = chain
     this.outputParser = outputParser
     this.tools = tools
-    this.feedbackTool = feedbackTool
     this.maxIterations = maxIterations
     const chunkSize = getEmbeddingContextSize(
       'modelName' in memory.vectorStore.embeddings
@@ -89,19 +73,15 @@ export class AutoGPT {
 
   static fromLLMAndTools(
     llm: BaseChatModel,
-    tools: ObjectTool[],
+    tools: Tool[],
     {
-      aiName,
-      aiRole,
       memory,
       maxIterations = 100,
       // humanInTheLoop = false,
       outputParser = new AutoGPTOutputParser(),
     }: AutoGPTInput,
   ): AutoGPT {
-    const prompt = new AutoGPTPrompt({
-      aiName,
-      aiRole,
+    const prompt = new ChatPrompt({
       tools,
       tokenCounter: llm.getNumTokens.bind(llm),
       sendTokenLimit: getModelContextSize(
@@ -111,7 +91,6 @@ export class AutoGPT {
     // const feedbackTool = humanInTheLoop ? new HumanInputRun() : null;
     const chain = new LLMChain({ llm, prompt })
     return new AutoGPT({
-      aiName,
       memory,
       chain,
       outputParser,
@@ -151,20 +130,11 @@ export class AutoGPT {
     const action = reply_json.command
     const tools = this.tools.reduce(
       (acc, tool) => ({ ...acc, [tool.name]: tool }),
-      {} as { [key: string]: ObjectTool },
+      {} as { [key: string]: Tool },
     )
-    if (action.name === FINISH_NAME) {
-      return {
-        reply_json,
-        tool_result: {
-          name: 'FINISH',
-          result: 'FINISH',
-        },
-      }
-    }
 
     let result: string
-    const tool_result = {} as AutoGPTToolResult
+    const tool_result = {} as any
     if (action.name in tools) {
       const tool = tools[action.name]
       let observation: string
@@ -186,14 +156,6 @@ export class AutoGPT {
     }
 
     const memoryToAdd = `Assistant Reply: ${assistantReply}\nResult: ${result} `
-    // if (this.feedbackTool) {
-    //   const feedback = `\n${await this.feedbackTool.call('Input: ')}`
-    //   if (feedback === 'q' || feedback === 'stop') {
-    //     console.log('EXITING')
-    //     return 'EXITING'
-    //   }
-    //   memoryToAdd += feedback
-    // }
 
     const documents = await this.textSplitter.createDocuments([memoryToAdd])
     await this.memory.addDocuments(documents)

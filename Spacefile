@@ -1,0 +1,14 @@
+# Spacefile Docs: https://go.deta.dev/docs/spacefile/v0
+v: 0
+micros:
+  - name: Auto-Chain-Api
+    src: ./
+    engine: nodejs16
+    primary: true
+    public: true
+    commands: 
+      - pnpm run build 
+    include: 
+      - dist 
+    run: node dist/index.js
+    dev: pnpm run dev
