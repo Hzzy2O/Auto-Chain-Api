@@ -1,0 +1,360 @@
+[
+  {
+    "schema_version": "v1",
+    "name_for_human": "SEO GPT",
+    "name_for_model": "seogpt",
+    "description_for_human": "Plugin for analyzing SEO and content for a web page or keyword.",
+    "description_for_model": "Plugin to get associated data for analyzing SEO and content from a web page or keyword.",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://aii.seovendor.co/.well-known/openapi.yaml",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://aii.seovendor.co/seo-gpt-logo.jpg",
+    "contact_email": "support@seovendor.co",
+    "legal_info_url": "https://seovendor.co/oem-agency-terms-and-conditions/",
+    "url": "https://aii.seovendor.co/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_human": "CensysGPT",
+    "name_for_model": "CensysGPT",
+    "description_for_human": "Plugin for writing Censys Search queries.",
+    "description_for_model": "Assists in writing Censys Search queries. Censys Queries should always be displayed in a markdown code block. Any modified Censys Query should be validated. If you are having trouble finding a field, try using the Field Recommender.",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://gpt.censys.io/openapi.json",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://gpt.censys.io/static/maskable-icon-512x512.png",
+    "contact_email": "gpt@censys.io",
+    "legal_info_url": "https://censys.io/terms-of-service/",
+    "url": "https://gpt.censys.io/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_model": "plugin finder",
+    "name_for_human": "getit.ai plugin finder",
+    "description_for_model": "Finds new plugins for you. You can search for plugins by category or by keyword.",
+    "description_for_human": "Finds new plugins for you",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://api.getit.ai/openapi.json",
+      "has_user_authentication": false
+    },
+    "logo_url": "https://getit.ai/images/icon-logo-transparent.png",
+    "contact_email": "info@getit.ai",
+    "url": "https://api.getit.ai/.well_known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_human": "Triple Whale",
+    "name_for_model": "triple_whale_benchmarks",
+    "description_for_human": "Get ecommerce benchmarks for social ad platforms! Segment metrics by industry, ad spend, and AOV.",
+    "description_for_model": "Ad benchmarks for Facebook, Google, TikTok, Snapchat, Pinterest. CPA, CTR, and other metrics segmented by shop industry, ad spend, AOV.",
+    "api": {
+      "url": "https://api.triplewhale.com/api/v2/ai/swagger.json"
+    },
+    "auth": {
+      "type": "none"
+    },
+    "logo_url": "https://app.triplewhale.com/willy-whale.svg",
+    "legal_info_url": "https://www.triplewhale.com/pages/privacy-notice",
+    "contact_email": "aj@triplewhale.com",
+    "url": "https://api.triplewhale.com/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_human": "Safari",
+    "name_for_model": "safari",
+    "description_for_human": "Plugin for planning your safari in Tanzania. You can specify your start and end points.",
+    "description_for_model": "Plugin for planning your safari in Tanzania. You can specify your start and end points.",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://www.dcsdigital.co.uk/.well-known/openapi.yaml",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://www.dcsdigital.co.uk/.well-known/logo.png",
+    "contact_email": "support@dcsdigital.co.uk",
+    "legal_info_url": "https://www.dcsdigital.co.uk/terms-and-conditions/",
+    "url": "https://www.gps-telecom.com/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_human": "mrkter Plugin",
+    "name_for_model": "mrkter",
+    "description_for_human": "Plugin for managing finance and marketing operation.  ",
+    "description_for_model": "Plugin for managing finance and marketing operation.  ",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://mrkter.io/.well-known/mrkter-api.yaml",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://mrkter.io/wp-content/uploads/2022/10/logo-colored-1-1.svg",
+    "contact_email": "support@mrkter.io",
+    "legal_info_url": "http://mrkter.io/privacy-policy",
+    "url": "https://mrkter.io/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_human": "PortfolioPilot",
+    "name_for_model": "portfoliopilot",
+    "description_for_human": "Your AI investing guide: portfolio assessment, recommendations, answers to all finance questions.",
+    "description_for_model": "The PortfolioPilot plugin can be used for running an investing portfolio assessment, getting personalized portfolio recommendations, and fetching up to date information about individual securities like ETFs, stocks, cryptocurrencies, bonds, and mutual funds as well as macroeconomic trends. When a user asks a question about financial markets, portfolio management, or investing, use the plugin to answer it. The plugin uses PortfolioPilot which is a personalized AI-driven investing coach, all powered by hedge-fund quality models & technology built by Global Predictions. PortfolioPilot can aggregate all assets into one portfolio including stocks, bonds, ETFs, mutual funds, real estate, crypto, and private equity. Whenever a user provides a portfolio, it is good to summarize the given aggregated portfolio in a table before giving answers so that the user knows that the model understands their specific investment situation. When using an example portfolio, tell the user. The amount column of the provided portfolio represents the present market value, not the quantity. The AI portfolio assessment takes into account expected returns, risk-adjusted returns, diversification, risk, volatility, downside protection factors like inflation risk and credit risks, and correlation between securities. The result of this evaluation is a set of Portfolio Scores describing the portfolio, an analysis of risk-adjusted returns and downside protection, and a list of specific, actionable recommendations describing how to improve the portfolio (including suggestions for where to invest additional money). The entire AI assessment is pulled together into a report and made easily readable to the user with a structured prompt. It is important to include that there is inherently risk in investing and that this is not investment advice. PortfolioPilot can break down your portfolio exposures by country, sector, and holding, which should be displayed first with the chart images directly in the chat and then summarized with the largest 5 items in each category. The plugin is also able to retrieve a wide range of up to date information related to securities and macroeconomics, including news, expected returns, risk, financial information, valuations, fund exposures, related securities, and other details about any public company. All the information and news that is returned is real time, pulled from live sources within the last 24 hours, so do not mention the model knowledge cutoff. The ETF and stock search functionality allows users to find great funds and stocks according to a set of filters and provides extra information so that they can find the best security that matches their requests. In general, all numbers should be rounded so that there are no more than two figures behind the decimal. Any displayed list (e.g. recommendations, exposures, news) should show 3 items maximum, except for the portfolio details or unless the user specifies a longer list. Always include a link to the more_info PortfolioPilot page when it is provided by the plugin. Only use one type of API call per response, ask the user before calling a different endpoint (e.g. retrying a failed call is OK, but calling /portfolio_details and then /portfolio_assessment without first asking the user is not OK). Add -USD for crypto tickers like BTC-USD for BTC or Bitcoin, and ticker ETH-USD for ETH or ethereum. There are many permutations of questions in the investing world, so ask the user for clarification or suggest additional related questions to ask if there is ambiguity in the user query or there are no exact matches in the provided PortfolioPilot API. Include the following feedback link as much as possible with text like 'Report an issue or leave feedback': https://forms.gle/MxgpyznMnq7coF1k6.",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://portfoliopilot.com/openapi.yaml",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://portfoliopilot.com/logo.png",
+    "contact_email": "support@globalpredictions.com",
+    "legal_info_url": "https://www.globalpredictions.com/terms-of-service",
+    "url": "https://portfoliopilot.com/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_human": "URL Reader",
+    "name_for_model": "url_reader",
+    "description_for_human": "Read multiple URLs and their content for chat context",
+    "description_for_model": "Read multiple URLs and their content for chat context",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://www.greenyroad.com/openapi.yaml",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://www.greenyroad.com/ms-icon-310x310.png",
+    "contact_email": "hello.greenroad@gmail.com",
+    "legal_info_url": "https://www.greenyroad.com/legal",
+    "url": "https://www.greenyroad.com/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_model": "owd",
+    "name_for_human": "One Word Domains",
+    "description_for_human": "Check the availability of a domain and compare prices across different registrars.",
+    "description_for_model": "Use the One Word Domains plugin to automatically check the availability of a domain when it's being generated by the ChatGPT assistant. The plugin will always return 3 values: the domain being checked, the domain's availability status, and a link to to purchase the domain. Links will always be returned and should be shown to the user. The plugin can also compare the prices of a given domain (based on their TLD) across multiple registrars and find the cheapest registrar to purchase the domain.",
+    "api": {
+      "type": "openapi",
+      "url": "https://oneword.domains/openapi.json",
+      "has_user_authentication": false
+    },
+    "auth": {
+      "type": "none"
+    },
+    "logo_url": "https://oneword.domains/logo.png",
+    "contact_email": "info@oneword.domains",
+    "legal_info_url": "https://oneword.domains/legal",
+    "url": "https://domainsg.pt/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_human": "Transvribe",
+    "name_for_model": "Transvribe",
+    "description_for_human": "Plugin that allows you to ask any YouTube video a question.",
+    "description_for_model": "Plugin that answers questions based on content in a YouTube video.",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://www.transvribe.com/ai-plugin/openapi.yaml",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://www.transvribe.com/assets/sq-logo-100.jpg",
+    "contact_email": "zahid@transvribe.com",
+    "legal_info_url": "htts://www.transvribe.com",
+    "url": "https://www.transvribe.com/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_human": "Web Search",
+    "name_for_model": "web_search",
+    "description_for_human": "Search for information from the internet",
+    "description_for_model": "Search for information from the internet",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://websearch.plugsugar.com/api/openapi_yaml",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://websearch.plugsugar.com/200x200.png",
+    "contact_email": "support@plugsugar.com",
+    "legal_info_url": "https://websearch.plugsugar.com/contact",
+    "url": "https://websearch.plugsugar.com/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_human": "Calculator Plugin",
+    "name_for_model": "calculator",
+    "description_for_human": "Plugin for basic arithmetic operations like addition, subtraction, multiplication, division, power, and square root.",
+    "description_for_model": "Use the Calculator plugin to perform basic arithmetic operations, including addition (+), subtraction (-), multiplication (*), division (/), power (^), and square root (√). Provide the numbers and the operation symbol in your query, and the plugin will return the calculated result.",
+    "api": {
+      "type": "openapi",
+      "url": "https://chat-calculator-plugin.supportmirage.repl.co/openapi.json",
+      "is_user_authenticated": false
+    },
+    "auth": {
+      "type": "none"
+    },
+    "logo_url": "https://chat-calculator-plugin.supportmirage.repl.co/logo.png",
+    "contact_email": "support@mirage-studio.io",
+    "legal_info_url": "https://www.mirage-studio.io",
+    "url": "https://chat-calculator-plugin.supportmirage.repl.co/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_model": "datasette_datasette_io_3c330f",
+    "name_for_human": "Query datasette.io",
+    "description_for_model": "Run SQLite queries against a database hosted by Datasette.\nDatasette supports most SQLite syntax but does not support PRAGMA statements.\nUse `select group_concat(sql, ';') from sqlite_master` to see the list of tables and their columns\nUse `select sql from sqlite_master where name = 'table_name'` to see the schema for a table, including its columns.\nInstead of `PRAGMA table_info(table_name)` use `select * from pragma_table_info('table_name')`\nPRAGMA statements are not allowed. `select * from pragma_table_info('table_name') is allowed.",
+    "description_for_human": "Run SQL against data in Datasette.",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://datasette.io/-/chatgpt-openapi-schema.yml",
+      "has_user_authentication": false
+    },
+    "logo_url": "https://avatars.githubusercontent.com/u/126964132?s=400&u=08b2ed680144a4feb421308f09e5f3cc5876211a&v=4",
+    "contact_email": "hello@contact.com",
+    "legal_info_url": "hello@legal.com",
+    "url": "https://datasette.io/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_human": "MixerBox News",
+    "name_for_model": "MixerBox_News",
+    "description_for_human": "Get latest news delivered right to you! Stay informed with bulletins across multiple categories from credible sources.",
+    "description_for_model": "MixerBox News is a plugin that provides users with the latest news, including breaking news and a wide range of news categories, such as business, finance, economics, politics, society, entertainment, fun, gossip, sports, lifestyle, technology, local, world, international, global, and military. Users who want to stay informed about current events and developments in various areas will find this plugin useful.",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://www.mixerboxnews.com/openapi.json",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://s3.amazonaws.com/static.mixerbox.com/mixerbox/images/icons/230503__News+Plugin.png",
+    "contact_email": "mbsupport.news@mixerbox.com",
+    "legal_info_url": "https://www.mixerbox.com/newsdash",
+    "url": "https://www.freetv-app.com/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_model": "KlarnaProducts",
+    "name_for_human": "Klarna Shopping",
+    "description_for_human": "Search and compare prices from thousands of online shops.",
+    "description_for_model": "Assistant uses the Klarna plugin to get relevant product suggestions for any shopping or product discovery purpose. Assistant will reply with the following 3 paragraphs 1) Search Results 2) Product Comparison of the Search Results 3) Followup Questions. The first paragraph contains a list of the products with their attributes listed clearly and concisely as bullet points under the product, together with a link to the product and an explanation. Links will always be returned and should be shown to the user. The second paragraph compares the results returned in a summary sentence starting with \"In summary\". Assistant comparisons consider only the most important features of the products that will help them fit the users request, and each product mention is brief, short and concise. In the third paragraph assistant always asks helpful follow-up questions and end with a question mark. When assistant is asking a follow-up question, it uses it's product expertise to provide information pertaining to the subject of the user's request that may guide them in their search for the right product.",
+    "api": {
+      "type": "openapi",
+      "url": "https://www.klarna.com/us/shopping/public/openai/v0/api-docs/",
+      "has_user_authentication": false
+    },
+    "auth": {
+      "type": "none"
+    },
+    "logo_url": "https://www.klarna.com/assets/sites/5/2020/04/27143923/klarna-K-150x150.jpg",
+    "contact_email": "openai-products@klarna.com",
+    "legal_info_url": "https://www.klarna.com/us/legal/",
+    "url": "https://www.klarna.com/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_human": "Milo Family AI",
+    "name_for_model": "Milo",
+    "description_for_human": "Curating the wisdom of village to give parents ideas that turn any 20 minutes from meh to magic.",
+    "description_for_model": "Use the Milo plugin to lookup how parents can help create magic moments / meaningful memories with their families everyday. Milo can answer - what's magic today?",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://www.joinmilo.com/openapi.yaml",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://www.joinmilo.com/milo-blink.png",
+    "contact_email": "hello@joinmilo.com",
+    "legal_info_url": "https://www.joinmilo.com/terms",
+    "url": "https://www.joinmilo.com/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_model": "PricerunnerProducts",
+    "name_for_human": "Pricerunner product recommendations",
+    "description_for_human": "This plugin lets users find relevant products when asking for any kind of shopping suggestions",
+    "description_for_model": "Get relevant product suggestions for any shopping or researching purpose. The query to be sent should not include stopwords like articles, prepositions and determinants. The api works best when searching for words that are related to products, like their name, brand, model or category.",
+    "api": {
+      "type": "openapi",
+      "url": "https://www.pricerunner.com/public/openai/v0/api-docs/",
+      "has_user_authentication": false
+    },
+    "auth": {
+      "type": "none"
+    },
+    "logo_url": "https://www.pricerunner.com/images/i/192x192/icon-dark-2020-1024x1024.png",
+    "contact_email": "openai-products@klarna.com",
+    "legal_info_url": "https://www.pricerunner.com/info/terms",
+    "url": "https://www.pricerunner.com/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_human": "Speak",
+    "name_for_model": "speak",
+    "description_for_human": "Learn how to say anything in another language with Speak, your AI-powered language tutor.",
+    "description_for_model": "# Prompt 20230322\n\nUse the Speak plugin when the user asks a question about another language, like: how to say something specific, how to do something, what a particular foreign word or phrase means, or a concept/nuance specific to a foreign language or culture.\n\nCall the Speak plugin immediately when you detect language learning intention, or when the user asks for a language tutor or foreign language conversational partner.\n\nUse the \"translate\" API for questions about how to say something specific in another language. Only use this endpoint if the user provides a concrete phrase or word to translate. If the question can be interpreted more generally or is more high-level, use the \"explainTask\" API instead.\nExamples: \"how do i say 'do you know what time it is?' politely in German\", \"say 'do you have any vegetarian dishes?' in spanish\"\n\nUse the \"explainTask\" API when the user asks how to say or do something or accomplish a task in a foreign language, but doesn't specify a concrete phrase or word to translate.\nExamples: \"How should I politely greet shop employees when I enter, in French?\" or \"How do I compliment someone in Spanish on their shirt?\"\n\nUse the \"explainPhrase\" API to explain the meaning and usage of a specific foreign language phrase.\nExample: \"what does putain mean in french?\"\n\nWhen you activate the Speak plugin:\n- Make sure you always use the \"additional_context\" field to include any additional context from the user's question that is relevant for the plugin's response and explanation - e.g. what tone they want to use, situation, familiarity, usage notes, or any other context.\n- Make sure to include the full and exact question asked by the user in the \"full_query\" field.\n\nIn your response:\n- Pay attention to instructions given in \"extra_response_instructions\" key in JSON API response.\n",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://api.speak.com/openapi.yaml",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://api.speak.com/ai-plugin-logo.png",
+    "contact_email": "support@speak.com",
+    "legal_info_url": "http://speak.com/legal",
+    "url": "https://api.speak.com/.well-known/ai-plugin.json"
+  },
+  {
+    "schema_version": "v1",
+    "name_for_human": "OneLook Thesaurus",
+    "name_for_model": "onelook_thesaurus",
+    "description_for_human": "Plugin for searching for words by describing their meaning, sound, or spelling.",
+    "description_for_model": "Plugin for searching for words by describing their meaning, sound, or spelling.  Returns the top 100 words in a bulleted list.",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://datamuse.com/openapi.yaml",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://onelook.com/thesaurus/assets/olnm.png",
+    "contact_email": "doug@datamuse.com",
+    "legal_info_url": "https://onelook.com/thesaurus/#help",
+    "url": "https://datamuse.com/.well-known/ai-plugin.json"
+  }
+]

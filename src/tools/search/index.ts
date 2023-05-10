@@ -33,3 +33,21 @@ export class WebSearchTool extends Tool {
     }
   }
 }
+
+export class BingAI extends Tool {
+  name = 'bing-ai'
+  description = 'can understand and use different languages, answer questions, give suggestions, and having the ability to search for web information and summarize it'
+
+  constructor() {
+    super()
+  }
+
+  async _call(query: string) {
+    try {
+      return await searchByBingAI(query)
+    }
+    catch (err) {
+      return `Error: ${err?.message}`
+    }
+  }
+}

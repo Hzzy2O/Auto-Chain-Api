@@ -7,13 +7,11 @@ import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { ContextualCompressionRetriever } from 'langchain/retrievers/contextual_compression'
 import { RetrievalQAChain } from 'langchain/chains'
 import { HumanChatMessage, SystemChatMessage } from 'langchain/schema'
-import { initializeAgentExecutorWithOptions } from 'langchain/agents'
 import { validateBody } from '../middleware'
 import { Config } from '@/config'
 import { getChatAI } from '@/api'
-import { countMessageTokens, count_string_tokens } from '@/utils/tokenCounter'
-import { getModelContextSize } from '@/autogpt/count_tokens'
-import { chatTools, tools } from '@/chat/tools'
+import { countMessageTokens, count_string_tokens, getModelContextSize } from '@/utils/tokenCounter'
+import { toolManage } from '@/chat/tools'
 
 const router = express.Router()
 
@@ -62,16 +60,16 @@ router.post('/chat/completions', validateBody(['model', 'messages']), async (req
     })
 
     if (plugins) {
-      const _tools = tools.filter(item => plugins.some(plg => plg.id === item.name))
-      const agent = await initializeAgentExecutorWithOptions(
-        tools,
-        getChatAI(),
-        { agentType: 'chat-zero-shot-react-description', verbose: true },
-      )
+      // const _tools = tools.filter(item => plugins.some(plg => plg.id === item.name))
+      // const agent = await initializeAgentExecutorWithOptions(
+      //   tools,
+      //   getChatAI(),
+      //   { agentType: 'chat-zero-shot-react-description', verbose: true },
+      // )
 
-      const result = await agent.call({
-        input: 'what did messi win in 2022 world cup?',
-      })
+      // const result = await agent.call({
+      //   input: 'what did messi win in 2022 world cup?',
+      // })
     }
 
     if (isTooLong) {
@@ -121,10 +119,23 @@ router.post('/chat/completions', validateBody(['model', 'messages']), async (req
   // })
 })
 
-router.get('/plugins', (req, res) => {
-  return res.send({
-    tools: chatTools,
+router.get('/plugins', async (req, res) => {
+  if (toolManage.initPromise)
+    await toolManage.initPromise
 
+  const tools = toolManage.chatToolsForUser
+  return res.send({
+    tools,
+
+  })
+})
+
+router.post('/plugins/add', validateBody(['url']), async (req, res) => {
+  const { url } = req.body
+  await toolManage.loadTools(url)
+
+  return res.send({
+    success: true,
   })
 })
 

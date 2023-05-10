@@ -13,6 +13,7 @@ import { validateBody } from '../middleware'
 import { Config } from '@/config'
 import { WebSearchTool } from '@/tools/search'
 import { getChatAI } from '@/api'
+import { toolManage } from '@/chat/tools'
 
 const router = express.Router()
 
@@ -85,16 +86,19 @@ router.post('/v1/chat/completions', validateBody(['model', 'messages']), async (
 })
 
 router.get('/plugins', (req, res) => {
-  const tools = chatTools.map((tool) => {
-    return {
-      name: tool.name,
-      description: tool.description,
-    }
-  })
-
+  const tools = toolManage.chatToolsForUser
   return res.send({
     tools,
 
+  })
+})
+
+router.post('/addPlugin', validateBody(['body']), async (req, res) => {
+  const { url } = req.body
+  await toolManage.loadTools(url)
+
+  return res.send({
+    success: true,
   })
 })
 
