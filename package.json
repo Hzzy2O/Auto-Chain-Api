@@ -32,7 +32,6 @@
     "express": "4.18.2",
     "get-stream": "^6.0.1",
     "googleapis": "^118.0.0",
-    "hnswlib-node": "^1.4.2",
     "http-proxy-agent": "^5.0.0",
     "https-proxy-agent": "^5.0.1",
     "isomorphic-fetch": "3.0.0",
