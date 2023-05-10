@@ -45,18 +45,16 @@ router.post('/chat/completions', validateBody(['model', 'messages']), async (req
       modelName: model,
       frequencyPenalty: rest.frequency_penalty,
       presencePenalty: rest.presence_penalty,
-      callbacks: [
-        {
-          handleLLMNewToken(token: string) {
-            process.stdout.write(token)
-            res.write(`data: ${JSON.stringify({
-              choices: [
-                token,
-              ],
-            })}\n\n`)
-          },
-        },
-      ],
+      // callbacks: {
+      //   handleLLMNewToken(token: string) {
+      //     process.stdout.write(token)
+      //     res.write(`data: ${JSON.stringify({
+      //         choices: [
+      //           token,
+      //         ],
+      //       })}\n\n`)
+      //   },
+      // },
     })
 
     if (plugins) {

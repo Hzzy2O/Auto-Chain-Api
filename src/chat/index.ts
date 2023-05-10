@@ -13,28 +13,26 @@ import { TokenTextSplitter } from 'langchain/text_splitter'
 
 import { ChatPrompt } from './prompt'
 
+import { ChatGPTOutputParser } from './parser'
 import {
   getEmbeddingContextSize,
   getModelContextSize,
 } from '@/utils/tokenCounter'
 
-import { AutoGPTOutputParser } from '@/parser'
-
-export interface AutoGPTInput {
+export interface ChatGPTInput {
   memory: VectorStoreRetriever
-  humanInTheLoop?: boolean
-  outputParser?: AutoGPTOutputParser
+  outputParser?: ChatGPTOutputParser
   maxIterations?: number
 }
 
-export class AutoGPT {
+export class ChatGPT {
   memory: VectorStoreRetriever
 
   fullMessageHistory: BaseChatMessage[]
 
   chain: LLMChain
 
-  outputParser: AutoGPTOutputParser
+  outputParser: ChatGPTOutputParser
 
   tools: Tool[]
 
@@ -49,7 +47,7 @@ export class AutoGPT {
     outputParser,
     tools,
     maxIterations,
-  }: Omit<Required<AutoGPTInput>, | 'humanInTheLoop'> & {
+  }: Omit<Required<ChatGPTInput>, | 'humanInTheLoop'> & {
     chain: LLMChain
     tools: Tool[]
     feedbackTool?: Tool
@@ -77,10 +75,9 @@ export class AutoGPT {
     {
       memory,
       maxIterations = 100,
-      // humanInTheLoop = false,
-      outputParser = new AutoGPTOutputParser(),
-    }: AutoGPTInput,
-  ): AutoGPT {
+      outputParser = new ChatGPTOutputParser(),
+    }: ChatGPTInput,
+  ): ChatGPT {
     const prompt = new ChatPrompt({
       tools,
       tokenCounter: llm.getNumTokens.bind(llm),
@@ -88,9 +85,8 @@ export class AutoGPT {
         'modelName' in llm ? (llm.modelName as string) : 'gpt2',
       ),
     })
-    // const feedbackTool = humanInTheLoop ? new HumanInputRun() : null;
     const chain = new LLMChain({ llm, prompt })
-    return new AutoGPT({
+    return new ChatGPT({
       memory,
       chain,
       outputParser,

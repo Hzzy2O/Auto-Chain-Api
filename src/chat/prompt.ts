@@ -8,7 +8,7 @@ import type {
 
 import type { BasePromptTemplate } from 'langchain'
 import type { StructuredTool, Tool } from 'langchain/tools'
-import { ZeroShotAgent } from 'langchain/agents'
+import { ZeroShotAgent, ChatAgent } from 'langchain/agents'
 import type { ModelType } from '@/types'
 
 export interface ChatPromptInput {

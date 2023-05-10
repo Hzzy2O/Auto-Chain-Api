@@ -1,9 +1,9 @@
-import type { OpenAIInput } from 'langchain/chat_models/openai'
+import type { OpenAIChatInput } from 'langchain/chat_models/openai'
 import { ChatOpenAI } from 'langchain/chat_models/openai'
 import { HumanChatMessage, SystemChatMessage } from 'langchain/schema'
 import { Config } from '@/config'
 
-export function getChatAI(input?: Partial<OpenAIInput>) {
+export function getChatAI(input?: Partial<OpenAIChatInput>) {
   return new ChatOpenAI({
     temperature: Config.TEMPERATURE,
     ...input,
