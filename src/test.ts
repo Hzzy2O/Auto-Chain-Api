@@ -5,36 +5,44 @@ import {
   RequestsPostTool,
 } from 'langchain/tools'
 import { BaseCallbackHandler } from 'langchain/callbacks'
-import type { AgentAction, AgentFinish, ChainValues } from 'langchain/schema'
 import { getChatAI } from './api'
 import { fetchAgent } from './utils'
 import { WebSearchTool } from './tools/search'
+import { AgentFinish, ChainValues } from 'langchain/schema'
 
 export class MyCallbackHandler extends BaseCallbackHandler {
   name = 'MyCallbackHandler'
 
-  async handleChainStart(chain: { name: string }) {
-    console.log(`Entering new ${chain.name} chain...`)
-  }
-
-  async handleChainEnd(_output: ChainValues) {
-    console.log('Finished chain.')
-  }
-
-  async handleAgentAction(action: AgentAction) {
-    console.log(action.log)
-  }
-
   async handleToolEnd(output: string) {
-    console.log('my tool end', output)
+    console.log('my tool end:', output)
   }
 
   async handleText(text: string) {
-    console.log(text)
+    console.log('text:', text)
   }
 
-  async handleAgentEnd(action: AgentFinish) {
-    console.log(action.log)
+  // handleLLMNewToken(token: string, runId: string, parentRunId?: string): void | Promise<void> {
+  //   console.log('new token', token)
+  // }
+
+  handleAgentAction(action: any) {
+    console.log('action start:', action)
+  }
+
+  handleAgentEnd(action: AgentFinish, runId: string, parentRunId?: string): void | Promise<void> {
+    console.log('action end:', action)
+  }
+
+  handleLLMStart(llm: { name: string }, prompts: string[], runId: string, parentRunId?: string): void | Promise<void> {
+    console.log('llm start:', llm)
+  }
+
+  handleChainStart(chain: { name: string }, inputs: ChainValues, runId: string, parentRunId?: string): void | Promise<void> {
+    console.log('chain start:', chain)
+  }
+
+  async handleToolStart(action) {
+    console.log('my tool start', action)
   }
 }
 
@@ -83,16 +91,19 @@ const pl = [
     ]
     const agent = await initializeAgentExecutorWithOptions(
       tools,
-      getChatAI(),
-      { agentType: 'chat-zero-shot-react-description', verbose: true, callbacks: [new MyCallbackHandler()] },
+      getChatAI({
+        streaming: true,
+      }),
+      { agentType: 'chat-zero-shot-react-description' },
     )
 
     const result = await agent.call({
       input: 'what did messi win in 2022 world cup?',
-    })
+    }, [new MyCallbackHandler()])
 
     console.log({ result })
   }
+  await run()
 
   // const res = await fetch('https://www.klarna.com/.well-known/ai-plugin.json')
   // console.log(await res.json())
@@ -112,40 +123,40 @@ const pl = [
   //   }),
   // })
   // console.log(await res.json())
-  Promise.allSettled(pl.map(getPluginFromUrl))
-    .then(async (plugins) => {
-      console.log({ plugins })
-      const res = plugins.filter(item => item.status === 'fulfilled').map(item => item.value).filter(item => item)
-      // writeFileSync('plugins.json', JSON.stringify(res, null, 2), 'utf-8')
-      console.log(res[0])
+  // Promise.allSettled(pl.map(getPluginFromUrl))
+  //   .then(async (plugins) => {
+  //     console.log({ plugins })
+  //     const res = plugins.filter(item => item.status === 'fulfilled').map(item => item.value).filter(item => item)
+  //     // writeFileSync('plugins.json', JSON.stringify(res, null, 2), 'utf-8')
+  //     console.log(res[0])
 
-      const tools = [
-        new RequestsGetTool({
-          agent: fetchAgent,
-        }),
-        new RequestsPostTool({
-          agent: fetchAgent,
-        }),
-        ...res,
+  //     const tools = [
+  //       new RequestsGetTool({
+  //         agent: fetchAgent,
+  //       }),
+  //       new RequestsPostTool({
+  //         agent: fetchAgent,
+  //       }),
+  //       ...res,
 
-        // new WebSearchTool(),
-      ]
-      const agent = await initializeAgentExecutorWithOptions(
-        tools,
-        getChatAI(),
-        { agentType: 'chat-zero-shot-react-description', verbose: true },
-      )
+  //       // new WebSearchTool(),
+  //     ]
+  //     const agent = await initializeAgentExecutorWithOptions(
+  //       tools,
+  //       getChatAI(),
+  //       { agentType: 'chat-zero-shot-react-description', verbose: true },
+  //     )
 
-      const result = await agent.call({
-        input: 'current time is 2023/5/10, search the web and answer who win the 2022 world cup?',
-      })
+  //     const result = await agent.call({
+  //       input: 'current time is 2023/5/10, search the web and answer who win the 2022 world cup?',
+  //     })
 
-      console.log(result)
+  //     console.log(result)
 
-      console.log(await agent.call({
-        input: 'who is 2022 world cup champion?',
-      }))
-    })
+  //     console.log(await agent.call({
+  //       input: 'who is 2022 world cup champion?',
+  //     }))
+  //   })
 })()
 
 async function getPluginFromUrl(url: string) {

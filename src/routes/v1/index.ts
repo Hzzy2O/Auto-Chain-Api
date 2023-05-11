@@ -1,4 +1,5 @@
 import express from 'express'
+import type { Response } from 'express'
 
 import { LLMChainExtractor } from 'langchain/retrievers/document_compressors/chain_extract'
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
@@ -8,6 +9,7 @@ import { ContextualCompressionRetriever } from 'langchain/retrievers/contextual_
 import { RetrievalQAChain } from 'langchain/chains'
 import { HumanChatMessage, SystemChatMessage } from 'langchain/schema'
 import { initializeAgentExecutorWithOptions } from 'langchain/agents'
+import { BaseCallbackHandler } from 'langchain/callbacks'
 import { validateBody } from '../middleware'
 import { Config } from '@/config'
 import { getChatAI } from '@/api'
@@ -15,6 +17,46 @@ import { countMessageTokens, count_string_tokens, getModelContextSize } from '@/
 import { toolManage } from '@/chat/tools'
 
 const router = express.Router()
+
+class MyCallbackHandler extends BaseCallbackHandler {
+  name = 'MyCallbackHandler'
+  response: Response
+
+  constructor(res: Response) {
+    super()
+    this.response = res
+  }
+
+  async handleToolEnd(output: string) {
+    console.log('my tool end:', output)
+  }
+
+  async handleText(text: string) {
+    console.log('text:', text)
+  }
+
+  handleLLMNewToken(token: string) {
+    this.response.write(`data: ${JSON.stringify({
+      choices: [
+        token,
+      ],
+    })}\n\n`)
+  }
+
+  handleAgentAction(action: any) {
+    const log = action.log
+
+    this.response.write(`data: ${JSON.stringify({
+      choices: [
+        {
+          content: '',
+          log,
+        },
+      ],
+    })}\n\n`)
+    console.log('action start:', action)
+  }
+}
 
 router.post('/chat/completions', validateBody(['model', 'messages']), async (req, res) => {
   try {
@@ -58,9 +100,10 @@ router.post('/chat/completions', validateBody(['model', 'messages']), async (req
         { agentType: 'chat-zero-shot-react-description', verbose: true },
       )
 
-      // const result = await agent.call({
-      //   input: 'what did messi win in 2022 world cup?',
-      // })
+      await agent.call({
+        input: 'what did messi win in 2022 world cup?',
+
+      }, [new MyCallbackHandler(res)])
     }
 
     if (isTooLong) {
