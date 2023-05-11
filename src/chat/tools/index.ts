@@ -21,6 +21,11 @@ interface ChatToolForUser {
 
 }
 
+const baseTool = [
+  getTool,
+  postTool,
+]
+
 export class ToolManage {
   tools = [
     getTool,
@@ -64,6 +69,15 @@ export class ToolManage {
     this.tools.push(await AIPluginTool.fromPluginUrl(url))
 
     this.chatToolsForUser.push(config)
+  }
+
+  pickTool(name: string) {
+    const tool = this.tools.find(item => item.name === name)
+
+    return [
+      ...baseTool,
+      tool,
+    ]
   }
 }
 

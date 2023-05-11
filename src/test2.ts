@@ -1,61 +1,30 @@
-import { ConversationSummaryMemory } from 'langchain/memory'
-import { LLMChain } from 'langchain/chains'
-import { PromptTemplate } from 'langchain/prompts'
+import { initializeAgentExecutorWithOptions } from 'langchain/agents'
+import {
+  AIPluginTool,
+  RequestsGetTool,
+  RequestsPostTool,
+} from 'langchain/tools'
 import { getChatAI } from './api'
 
-async function run() {
-  const memory = new ConversationSummaryMemory({
-    memoryKey: 'chat_history',
-    llm: getChatAI({
-      temperature: 0,
-    }),
+export async function run() {
+  const tools = [
+    new RequestsGetTool(),
+    new RequestsPostTool(),
+    await AIPluginTool.fromPluginUrl(
+      'https://www.klarna.com/.well-known/ai-plugin.json',
+    ),
+  ]
+  const agent = await initializeAgentExecutorWithOptions(
+    tools,
+    getChatAI(),
+    { agentType: 'chat-zero-shot-react-description', verbose: true },
+  )
+
+  const result = await agent.call({
+    input: 'what t shirts are available in klarna?',
   })
 
-  const model = getChatAI({
-    temperature: 0.9,
-    streaming: true,
-    callbacks: [
-      {
-        handleLLMNewToken(token: string) {
-          process.stdout.write(token)
-        },
-      },
-    ],
-  })
-  const prompt
-    = PromptTemplate.fromTemplate(`The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know.
-
-  Current conversation:
-  {chat_history}
-  Human: {input}
-  AI:`)
-  const chain = new LLMChain({ llm: model, prompt, memory })
-
-  const res1 = await chain.call({ input: 'Hi! I\'m Jim.' })
-  console.log({ res1, memory: await memory.loadMemoryVariables({}) })
-  /*
-  {
-    res1: {
-      text: " Hi Jim, I'm AI! It's nice to meet you. I'm an AI programmed to provide information about the environment around me. Do you have any specific questions about the area that I can answer for you?"
-    },
-    memory: {
-      chat_history: 'Jim introduces himself to the AI and the AI responds, introducing itself as a program designed to provide information about the environment. The AI offers to answer any specific questions Jim may have about the area.'
-    }
-  }
-  */
-
-  const res2 = await chain.call({ input: 'What\'s my name?' })
-  console.log({ res2, memory: await memory.loadMemoryVariables({}) })
-  /*
-  {
-    res2: { text: ' You told me your name is Jim.' },
-    memory: {
-      chat_history: 'Jim introduces himself to the AI and the AI responds, introducing itself as a program designed to provide information about the environment. The AI offers to answer any specific questions Jim may have about the area. Jim asks the AI what his name is, and the AI responds that Jim had previously told it his name.'
-    }
-  }
-  */
+  console.log({ result })
 }
 
-(async () => {
-  await run()
-})()
+run()

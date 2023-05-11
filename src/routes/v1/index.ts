@@ -7,6 +7,7 @@ import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { ContextualCompressionRetriever } from 'langchain/retrievers/contextual_compression'
 import { RetrievalQAChain } from 'langchain/chains'
 import { HumanChatMessage, SystemChatMessage } from 'langchain/schema'
+import { initializeAgentExecutorWithOptions } from 'langchain/agents'
 import { validateBody } from '../middleware'
 import { Config } from '@/config'
 import { getChatAI } from '@/api'
@@ -23,7 +24,7 @@ router.post('/chat/completions', validateBody(['model', 'messages']), async (req
       'Connection': 'keep-alive',
     })
     res.flushHeaders()
-    const { model, messages: _messages, plugins, ...rest } = req.body
+    const { model, messages: _messages, plugin, ...rest } = req.body
 
     const messages = _messages.filter((m: any) => m.role && m.content.trim().length > 0)
 
@@ -45,25 +46,17 @@ router.post('/chat/completions', validateBody(['model', 'messages']), async (req
       modelName: model,
       frequencyPenalty: rest.frequency_penalty,
       presencePenalty: rest.presence_penalty,
-      // callbacks: {
-      //   handleLLMNewToken(token: string) {
-      //     process.stdout.write(token)
-      //     res.write(`data: ${JSON.stringify({
-      //         choices: [
-      //           token,
-      //         ],
-      //       })}\n\n`)
-      //   },
-      // },
+
     })
 
-    if (plugins) {
-      // const _tools = tools.filter(item => plugins.some(plg => plg.id === item.name))
-      // const agent = await initializeAgentExecutorWithOptions(
-      //   tools,
-      //   getChatAI(),
-      //   { agentType: 'chat-zero-shot-react-description', verbose: true },
-      // )
+    if (plugin) {
+      const tools = toolManage.pickTool(plugin.id)
+      // \
+      const agent = await initializeAgentExecutorWithOptions(
+        tools,
+        getChatAI(),
+        { agentType: 'chat-zero-shot-react-description', verbose: true },
+      )
 
       // const result = await agent.call({
       //   input: 'what did messi win in 2022 world cup?',

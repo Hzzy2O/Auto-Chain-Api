@@ -1,73 +1,45 @@
-import { BaseOutputParser } from 'langchain/schema/output_parser'
-import balanced from 'balanced-match'
+import { ChatAgentOutputParser } from 'langchain/agents'
 
-export function preprocessJsonInput(inputStr: string): string {
-  // Replace single backslashes with double backslashes,
-  // while leaving already escaped ones intact
-  const correctedStr = inputStr.replace(
-    /(?<!\\)\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g,
-    '\\\\',
-  )
-  return correctedStr
-}
+// import { FORMAT_INSTRUCTIONS } from './prompt.js'
 
-interface ChatGPTAction {
+export const FINAL_ANSWER_ACTION = 'Final Answer:'
+export class ChatGPTOutputParser extends ChatAgentOutputParser {
+  async parse(text: string) {
+    if (text.includes(FINAL_ANSWER_ACTION)) {
+      const parts = text.split(FINAL_ANSWER_ACTION)
+      const output = parts[parts.length - 1].trim()
+      return { returnValues: { output }, log: text }
+    }
 
-}
+    try {
+      const match = /Action: (.*)\nAction Input: (.*)/s.exec(text)
+      if (!match)
+        throw new Error(`Could not parse LLM output: ${text}`)
 
-export class ChatGPTOutputParser extends BaseOutputParser<ChatGPTAction> {
-  getFormatInstructions(): string {
-    throw new Error('Method not implemented.')
+      return {
+        tool: match[1].trim(),
+        toolInput: match[2].trim().replace(/^"+|"+$/g, ''),
+        log: text,
+      }
+
+      // const action = text.includes('```')
+      //   ? text.trim().split(/```(?:json)?/)[1]
+      //   : text.trim()
+      // const response = JSON.parse(action.trim())
+      // return {
+      //   tool: response.action,
+      //   toolInput: response.action_input,
+      //   log: text,
+      // }
+    }
+    catch {
+      throw new Error(
+        `Unable to parse JSON response from chat agent.\n\n${text}`,
+      )
+    }
   }
 
-  async parse(text: string): Promise<ChatGPTAction> {
-    let parsed: ChatGPTAction
-    try {
-      parsed = JSON.parse(text)
-    }
-    catch (error) {
-      const preprocessedText = preprocessJsonInput(text)
-      try {
-        const match = balanced('{', '}', preprocessedText)
-        if (match && match.body)
-          parsed = JSON.parse(`{${match.body}}`)
-      }
-      catch (error) {
-        try {
-          // const json = await fixAndParseJson(preprocessedText)
-          // if (typeof json === 'string')
-          //   throw json
-
-          // parsed = json.command
-        }
-        catch (error) {
-          return {
-            command: {
-              name: 'ERROR',
-              args: { error: `Could not parse invalid json: ${text}` },
-            },
-          }
-        }
-      }
-    }
-    try {
-      return {
-        // thoughts: {
-        //   ...(parsed.thoughts ?? {} as any),
-        // },
-        // command: {
-        //   name: parsed.command.name,
-        //   args: parsed.command.args,
-        // },
-      }
-    }
-    catch (error) {
-      return {
-        command: {
-          name: 'ERROR',
-          args: { error: `Incomplete command args: ${parsed}` },
-        },
-      }
-    }
+  getFormatInstructions(): string {
+    throw new Error('Not implemented')
   }
 }

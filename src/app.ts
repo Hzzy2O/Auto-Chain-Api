@@ -44,7 +44,6 @@ class AutoGptManager {
 
     const filePath = `tmp/${gpt_id}`
     mkdirSync(filePath)
-    console.log(readdirSync(filePath))
     const fileStore = new NodeIOFileStore(filePath)
 
     const autogpt = AutoGPT.fromLLMAndTools(

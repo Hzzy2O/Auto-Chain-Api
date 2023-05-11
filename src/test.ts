@@ -4,9 +4,39 @@ import {
   RequestsGetTool,
   RequestsPostTool,
 } from 'langchain/tools'
+import { BaseCallbackHandler } from 'langchain/callbacks'
+import type { AgentAction, AgentFinish, ChainValues } from 'langchain/schema'
 import { getChatAI } from './api'
 import { fetchAgent } from './utils'
 import { WebSearchTool } from './tools/search'
+
+export class MyCallbackHandler extends BaseCallbackHandler {
+  name = 'MyCallbackHandler'
+
+  async handleChainStart(chain: { name: string }) {
+    console.log(`Entering new ${chain.name} chain...`)
+  }
+
+  async handleChainEnd(_output: ChainValues) {
+    console.log('Finished chain.')
+  }
+
+  async handleAgentAction(action: AgentAction) {
+    console.log(action.log)
+  }
+
+  async handleToolEnd(output: string) {
+    console.log('my tool end', output)
+  }
+
+  async handleText(text: string) {
+    console.log(text)
+  }
+
+  async handleAgentEnd(action: AgentFinish) {
+    console.log(action.log)
+  }
+}
 
 const pl = [
   // 'https://aii.seovendor.co/.well-known/ai-plugin.json',
@@ -54,7 +84,7 @@ const pl = [
     const agent = await initializeAgentExecutorWithOptions(
       tools,
       getChatAI(),
-      { agentType: 'chat-zero-shot-react-description', verbose: true },
+      { agentType: 'chat-zero-shot-react-description', verbose: true, callbacks: [new MyCallbackHandler()] },
     )
 
     const result = await agent.call({
@@ -113,7 +143,7 @@ const pl = [
       console.log(result)
 
       console.log(await agent.call({
-        input: "who is 2022 world cup champion?"
+        input: 'who is 2022 world cup champion?',
       }))
     })
 })()

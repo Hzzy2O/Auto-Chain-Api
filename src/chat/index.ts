@@ -1,165 +1,85 @@
-import type { VectorStoreRetriever } from 'langchain/vectorstores/base'
 import type { Tool } from 'langchain/tools'
 
-import type { BaseChatMessage } from 'langchain/schema'
-import {
-  AIChatMessage,
-  HumanChatMessage,
-  SystemChatMessage,
-} from 'langchain/schema'
 import { LLMChain } from 'langchain/chains'
 import type { BaseChatModel } from 'langchain/chat_models'
-import { TokenTextSplitter } from 'langchain/text_splitter'
+import type { TokenTextSplitter } from 'langchain/text_splitter'
 
+import type { AgentActionOutputParser } from 'langchain/agents'
+import { AgentExecutor, LLMSingleActionAgent } from 'langchain/agents'
 import { ChatPrompt } from './prompt'
-
+import { ChatCallbackHandler } from './callback'
 import { ChatGPTOutputParser } from './parser'
-import {
-  getEmbeddingContextSize,
-  getModelContextSize,
-} from '@/utils/tokenCounter'
 
 export interface ChatGPTInput {
-  memory: VectorStoreRetriever
-  outputParser?: ChatGPTOutputParser
-  maxIterations?: number
+  outputParser?: AgentActionOutputParser
+  callbackHandler?: ChatCallbackHandler
 }
 
 export class ChatGPT {
-  memory: VectorStoreRetriever
-
-  fullMessageHistory: BaseChatMessage[]
-
   chain: LLMChain
 
-  outputParser: ChatGPTOutputParser
+  outputParser: AgentActionOutputParser
 
   tools: Tool[]
 
-  maxIterations: number
+  callbackHandler: ChatCallbackHandler
 
-  // Currently not generic enough to support any text splitter.
   textSplitter: TokenTextSplitter
 
   constructor({
-    memory,
     chain,
     outputParser,
     tools,
-    maxIterations,
-  }: Omit<Required<ChatGPTInput>, | 'humanInTheLoop'> & {
+    callbackHandler,
+  }: Required<ChatGPTInput> & {
     chain: LLMChain
     tools: Tool[]
-    feedbackTool?: Tool
   }) {
-    this.memory = memory
-    this.fullMessageHistory = []
     this.chain = chain
     this.outputParser = outputParser
     this.tools = tools
-    this.maxIterations = maxIterations
-    const chunkSize = getEmbeddingContextSize(
-      'modelName' in memory.vectorStore.embeddings
-        ? (memory.vectorStore.embeddings.modelName as string)
-        : undefined,
-    )
-    this.textSplitter = new TokenTextSplitter({
-      chunkSize,
-      chunkOverlap: Math.round(chunkSize / 10),
-    })
+    this.callbackHandler = callbackHandler
   }
 
   static fromLLMAndTools(
     llm: BaseChatModel,
     tools: Tool[],
     {
-      memory,
-      maxIterations = 100,
       outputParser = new ChatGPTOutputParser(),
+      callbackHandler,
     }: ChatGPTInput,
   ): ChatGPT {
     const prompt = new ChatPrompt({
       tools,
-      tokenCounter: llm.getNumTokens.bind(llm),
-      sendTokenLimit: getModelContextSize(
-        'modelName' in llm ? (llm.modelName as string) : 'gpt2',
-      ),
+
     })
-    const chain = new LLMChain({ llm, prompt })
+    const chain = new LLMChain({
+      llm,
+      prompt,
+      // callbacks: [new ChatCallbackHandler({} as any)],
+    })
     return new ChatGPT({
-      memory,
       chain,
       outputParser,
       tools,
-      // feedbackTool,
-      maxIterations,
+      callbackHandler: new ChatCallbackHandler({ } as any),
     })
   }
 
-  async run(goals: string[]): Promise<string | undefined> {
-    let loopCount = 0
-    while (loopCount < this.maxIterations) {
-      loopCount += 1
-
-      await this.singleRun(goals)
-    }
-
-    return undefined
-  }
-
-  async singleRun(goals: string[]) {
-    const user_input
-      = 'Determine which next command to use, and respond using the format specified above:'
-    const { text: assistantReply } = await this.chain.call({
-      goals,
-      user_input,
-      memory: this.memory,
-      messages: this.fullMessageHistory,
+  async run(input: string) {
+    const agent = new LLMSingleActionAgent({
+      llmChain: this.chain,
+      outputParser: this.outputParser,
+      stop: ['\nObservation'],
+    })
+    const executor = new AgentExecutor({
+      agent,
+      tools: this.tools,
     })
 
-    // Print the assistant reply
-    console.log('assistantReply is:', assistantReply)
-    this.fullMessageHistory.push(new HumanChatMessage(user_input))
-    this.fullMessageHistory.push(new AIChatMessage(assistantReply))
+    const result = await executor.call({ input }, [this.callbackHandler])
+    console.log(result)
 
-    const reply_json = await this.outputParser.parse(assistantReply)
-    const action = reply_json.command
-    const tools = this.tools.reduce(
-      (acc, tool) => ({ ...acc, [tool.name]: tool }),
-      {} as { [key: string]: Tool },
-    )
-
-    let result: string
-    const tool_result = {} as any
-    if (action.name in tools) {
-      const tool = tools[action.name]
-      let observation: string
-      try {
-        observation = await tool.call(action.args)
-      }
-      catch (e) {
-        observation = `Error in args: ${e}`
-      }
-      tool_result.name = tool.name
-      tool_result.result = observation
-      result = `Command ${tool.name} returned: ${observation}`
-    }
-    else if (action.name === 'ERROR') {
-      result = `Error: ${action.args.error}. `
-    }
-    else {
-      result = `Unknown command '${action.name}'. Please refer to the 'COMMANDS' list for available commands and only respond in the specified JSON format.`
-    }
-
-    const memoryToAdd = `Assistant Reply: ${assistantReply}\nResult: ${result} `
-
-    const documents = await this.textSplitter.createDocuments([memoryToAdd])
-    await this.memory.addDocuments(documents)
-    this.fullMessageHistory.push(new SystemChatMessage(result))
-
-    return {
-      reply_json,
-      tool_result,
-    }
+    return result
   }
 }
