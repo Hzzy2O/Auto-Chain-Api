@@ -2,36 +2,61 @@ import type { Response } from 'express'
 import { BaseCallbackHandler } from 'langchain/callbacks'
 import type { AgentAction } from 'langchain/schema'
 
-export class ChatCallbackHandler extends BaseCallbackHandler {
-  name = 'ChatCallbackHandler'
-
+interface Reply {
+  content: string
+  plugin: {
+    request?: string
+    response?: string
+  }
+}
+export class ResCallbackHandler extends BaseCallbackHandler {
+  name = 'ResCallbackHandler'
   response: Response
+  toolUsed = false
 
   constructor(res: Response) {
     super()
-    console.log('load callbacks handler')
-
     this.response = res
   }
 
-  handleAgentAction(action: AgentAction) {
-    // console.log('')
-  }
-
-  async handleToolStart(action) {
-    console.log('my tool start', action)
-  }
-
-  async handleToolError(err: any) {
-    console.log('my tool error', err)
+  reply(val: Partial<Reply>) {
+    this.response.write(`data: ${JSON.stringify({
+      choices: [
+        {
+          ...val,
+        },
+      ],
+    })}\n\n`)
   }
 
   async handleToolEnd(output: string) {
-    console.log('my tool end', output)
+    this.reply({
+      content: '',
+      plugin: {
+        response: output,
+      },
+    })
+    this.toolUsed = true
   }
 
   handleLLMNewToken(token: string) {
-    process.stdout.write(token)
-    console.log('llm token:', token)
+    if (this.toolUsed) {
+      this.reply({
+        content: token,
+      })
+    }
+  }
+
+  handleAgentEnd() {
+    this.response.write('data: [DONE]\n\n')
+  }
+
+  handleAgentAction(action: AgentAction) {
+    this.reply({
+      content: '',
+      plugin: {
+        request: action.toolInput,
+      },
+    })
   }
 }

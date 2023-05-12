@@ -7,12 +7,12 @@ import type { TokenTextSplitter } from 'langchain/text_splitter'
 import type { AgentActionOutputParser } from 'langchain/agents'
 import { AgentExecutor, LLMSingleActionAgent } from 'langchain/agents'
 import { ChatPrompt } from './prompt'
-import { ChatCallbackHandler } from './callback'
+import type { ResCallbackHandler } from './callback'
 import { ChatGPTOutputParser } from './parser'
 
 export interface ChatGPTInput {
   outputParser?: AgentActionOutputParser
-  callbackHandler?: ChatCallbackHandler
+  callbackHandler?: ResCallbackHandler
 }
 
 export class ChatGPT {
@@ -22,7 +22,7 @@ export class ChatGPT {
 
   tools: Tool[]
 
-  callbackHandler: ChatCallbackHandler
+  callbackHandler: ResCallbackHandler
 
   textSplitter: TokenTextSplitter
 
@@ -51,18 +51,16 @@ export class ChatGPT {
   ): ChatGPT {
     const prompt = new ChatPrompt({
       tools,
-
     })
     const chain = new LLMChain({
       llm,
       prompt,
-      // callbacks: [new ChatCallbackHandler({} as any)],
     })
     return new ChatGPT({
       chain,
       outputParser,
       tools,
-      callbackHandler: new ChatCallbackHandler({ } as any),
+      callbackHandler,
     })
   }
 

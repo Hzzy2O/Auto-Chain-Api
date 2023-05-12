@@ -1,60 +1,72 @@
 import express from 'express'
 import type { Response } from 'express'
 
-import { LLMChainExtractor } from 'langchain/retrievers/document_compressors/chain_extract'
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
-import { MemoryVectorStore } from 'langchain/vectorstores/memory'
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
-import { ContextualCompressionRetriever } from 'langchain/retrievers/contextual_compression'
-import { RetrievalQAChain } from 'langchain/chains'
-import { HumanChatMessage, SystemChatMessage } from 'langchain/schema'
+import type { AgentAction } from 'langchain/schema'
 import { initializeAgentExecutorWithOptions } from 'langchain/agents'
 import { BaseCallbackHandler } from 'langchain/callbacks'
 import { validateBody } from '../middleware'
-import { Config } from '@/config'
 import { getChatAI } from '@/api'
 import { countMessageTokens, count_string_tokens, getModelContextSize } from '@/utils/tokenCounter'
 import { toolManage } from '@/chat/tools'
 
 const router = express.Router()
 
-class MyCallbackHandler extends BaseCallbackHandler {
-  name = 'MyCallbackHandler'
+interface Reply {
+  content: string
+  plugin: {
+    request?: string
+    response?: string
+  }
+}
+class ResCallbackHandler extends BaseCallbackHandler {
+  name = 'ResCallbackHandler'
   response: Response
+  toolUsed = false
 
   constructor(res: Response) {
     super()
     this.response = res
   }
 
-  async handleToolEnd(output: string) {
-    console.log('my tool end:', output)
-  }
-
-  async handleText(text: string) {
-    console.log('text:', text)
-  }
-
-  handleLLMNewToken(token: string) {
-    this.response.write(`data: ${JSON.stringify({
-      choices: [
-        token,
-      ],
-    })}\n\n`)
-  }
-
-  handleAgentAction(action: any) {
-    const log = action.log
-
+  reply(val: Partial<Reply>) {
     this.response.write(`data: ${JSON.stringify({
       choices: [
         {
-          content: '',
-          log,
+          ...val,
         },
       ],
     })}\n\n`)
-    console.log('action start:', action)
+  }
+
+  async handleToolEnd(output: string) {
+    this.reply({
+      content: '',
+      plugin: {
+        response: output,
+      },
+    })
+    this.toolUsed = true
+  }
+
+  handleLLMNewToken(token: string) {
+    if (this.toolUsed) {
+      this.reply({
+        content: token,
+      })
+    }
+  }
+
+  handleAgentEnd() {
+    this.response.write('data: [DONE]\n\n')
+  }
+
+  handleAgentAction(action: AgentAction) {
+    this.reply({
+      content: '',
+      plugin: {
+        request: action.toolInput,
+      },
+    })
   }
 }
 
@@ -88,56 +100,56 @@ router.post('/chat/completions', validateBody(['model', 'messages']), async (req
       modelName: model,
       frequencyPenalty: rest.frequency_penalty,
       presencePenalty: rest.presence_penalty,
-
     })
 
     if (plugin) {
       const tools = toolManage.pickTool(plugin.id)
-      // \
       const agent = await initializeAgentExecutorWithOptions(
         tools,
-        getChatAI(),
-        { agentType: 'chat-zero-shot-react-description', verbose: true },
+        getChatAI({
+          streaming: true,
+        }),
+        { agentType: 'chat-zero-shot-react-description' },
       )
 
       await agent.call({
         input: 'what did messi win in 2022 world cup?',
 
-      }, [new MyCallbackHandler(res)])
+      }, [new ResCallbackHandler(res)])
     }
 
-    if (isTooLong) {
-      const baseCompressor = LLMChainExtractor.fromLLM(chatAI)
+    // if (isTooLong) {
+    //   const baseCompressor = LLMChainExtractor.fromLLM(chatAI)
 
-      const text = messages.map((m: any) => `${m.role}:${m.content}`).join('\n')
+    //   const text = messages.map((m: any) => `${m.role}:${m.content}`).join('\n')
 
-      const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 })
-      const docs = await textSplitter.createDocuments([text])
+    //   const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 })
+    //   const docs = await textSplitter.createDocuments([text])
 
-      // Create a vector store from the documents.
-      const vectorStore = await MemoryVectorStore.fromDocuments(docs, new OpenAIEmbeddings({
-        openAIApiKey: Config.OPENAI_API_KEY,
-      }, {
-        basePath: Config.OPENAI_URL,
-      }))
+    //   // Create a vector store from the documents.
+    //   const vectorStore = await MemoryVectorStore.fromDocuments(docs, new OpenAIEmbeddings({
+    //     openAIApiKey: Config.OPENAI_API_KEY,
+    //   }, {
+    //     basePath: Config.OPENAI_URL,
+    //   }))
 
-      const retriever = new ContextualCompressionRetriever({
-        baseCompressor,
-        baseRetriever: vectorStore.asRetriever(),
-      })
+    //   const retriever = new ContextualCompressionRetriever({
+    //     baseCompressor,
+    //     baseRetriever: vectorStore.asRetriever(),
+    //   })
 
-      const chain = RetrievalQAChain.fromLLM(model, retriever)
+    //   const chain = RetrievalQAChain.fromLLM(model, retriever)
 
-      await chain.call({
-        query: question,
-      })
-    }
-    else {
-      await chatAI.call([
-        ...messages.map(item => item.role === 'user' ? new HumanChatMessage(item.content) : new SystemChatMessage(item.content)),
-        new HumanChatMessage(question),
-      ])
-    }
+    //   await chain.call({
+    //     query: question,
+    //   })
+    // }
+    // else {
+    //   await chatAI.call([
+    //     ...messages.map(item => item.role === 'user' ? new HumanChatMessage(item.content) : new SystemChatMessage(item.content)),
+    //     new HumanChatMessage(question),
+    //   ])
+    // }
     process.stdout.write('[DONE]')
     res.write('data: [DONE]\n\n')
     res.end()

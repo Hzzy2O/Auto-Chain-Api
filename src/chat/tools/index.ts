@@ -75,7 +75,7 @@ export class ToolManage {
     const tool = this.tools.find(item => item.name === name)
 
     return [
-      ...baseTool,
+      // ...baseTool,
       tool,
     ]
   }
